@@ -315,21 +315,26 @@ main {
 
 /* 아카이브 컨테이너 */
 .archive-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .archive-container .next-btn {
-  margin-top: 30px;
+  margin: 30px auto;
+  position: relative;
+  z-index: 10;
 }
 
 .archive-header {
   text-align: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
+  padding: 40px 20px 20px;
+  background-color: #fff;
+  flex-shrink: 0;
 }
 
 .archive-header h2 {
@@ -355,37 +360,143 @@ main {
 }
 
 .message-archive {
-  display: grid;
-  gap: 15px;
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 60px 0 100px;
+  perspective: 1500px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+}
+
+.message-archive-wrapper {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 50vw;
+  min-width: min-content;
+}
+
+.message-archive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.message-archive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.message-archive::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.message-archive::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .message-item {
-  background-color: #fff;
+  position: relative;
+  width: 140px;
+  min-width: 140px;
+  height: 280px;
+  background: #f5f5f5;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: bottom center;
+  overflow: hidden;
+  margin-right: 30px;
+  flex-shrink: 0;
+}
+
+/* 접힌 모서리 효과 */
+.message-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 30px 30px 0;
+  border-color: transparent #ddd transparent transparent;
+  transition: all 0.3s;
+}
+
+.message-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 28px 28px 0;
+  border-color: transparent #e8e8e8 transparent transparent;
+  transition: all 0.3s;
+}
+
+.message-item:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  z-index: 10 !important;
+  background: #fff;
+}
+
+.message-item:hover::after {
+  border-color: transparent #f5f5f5 transparent transparent;
+}
+
+.message-item.expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  width: 500px;
+  height: 600px;
+  z-index: 1000 !important;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid #999;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.message-item.expanded::before {
+  border-width: 0 50px 50px 0;
+  border-color: transparent #999 transparent transparent;
+}
+
+.message-item.expanded::after {
+  border-width: 0 48px 48px 0;
+  border-color: transparent #f8f8f8 transparent transparent;
 }
 
 .message-item-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
 }
 
 .message-sender {
   font-weight: bold;
-  color: #0066cc;
+  color: #333;
   display: block;
+  font-size: 1em;
 }
 
 .message-receiver {
   font-weight: bold;
-  color: #28a745;
+  color: #555;
   display: block;
+  font-size: 1em;
 }
 
 .message-phone {
@@ -396,20 +507,49 @@ main {
 }
 
 .message-content {
-  font-size: 1.1em;
-  line-height: 1.5;
-  margin: 10px 0;
+  font-size: 0.85em;
+  line-height: 1.4;
+  margin: 12px 0;
+  color: #333;
+  max-height: 140px;
+  overflow: hidden;
 }
 
 .message-damaged {
-  color: #666;
-  font-style: italic;
+  color: #333;
+  font-style: normal;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
 }
 
 .message-timestamp {
-  font-size: 0.9em;
-  color: #666;
+  font-size: 0.75em;
+  color: #999;
   text-align: right;
+  margin-top: auto;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+/* 오버레이 배경 */
+.archive-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+.archive-overlay.active {
+  display: block;
 }
 
 /* 리셋 버튼 */
@@ -431,9 +571,9 @@ main {
 
 /* 출력용 스타일 */
 @media print {
-  /* A5 용지 설정 - 한 장에 모든 내용 */
+  /* A5 용지 설정 - 가로 방향 */
   @page {
-    size: A5 portrait;
+    size: A5 landscape;
     margin: 10mm;
   }
   

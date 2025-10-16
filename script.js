@@ -191,10 +191,11 @@ async function autoPrint() {
   }, 3000);
 }
 
-// 아카이브 업데이트
+// 아카이브 업데이트 (쪽지 쌓기 효과)
 function updateArchive() {
   const messageCount = document.getElementById('messageCount');
   const messageArchiveDiv = document.getElementById('messageArchive');
+  const overlay = document.getElementById('archiveOverlay');
   
   if (messageCount) {
     messageCount.textContent = messageArchive.length;
@@ -203,15 +204,39 @@ function updateArchive() {
   if (messageArchiveDiv) {
     messageArchiveDiv.innerHTML = '';
     
-    messageArchive.forEach(message => {
+    // wrapper 생성
+    const wrapper = document.createElement('div');
+    wrapper.className = 'message-archive-wrapper';
+    
+    // 무채색 배경 배열
+    const backgrounds = [
+      '#f5f5f5',
+      '#e8e8e8',
+      '#ffffff',
+      '#ebebeb',
+      '#f0f0f0',
+      '#e5e5e5',
+      '#fafafa',
+      '#ededed',
+    ];
+    
+    messageArchive.forEach((message, index) => {
       const messageItem = document.createElement('div');
       messageItem.className = 'message-item';
+      
+      // 랜덤 회전 효과
+      const rotation = (Math.random() - 0.5) * 4; // -2도 ~ 2도 랜덤 회전
+      
+      messageItem.style.transform = `rotate(${rotation}deg)`;
+      messageItem.style.background = backgrounds[index % backgrounds.length];
+      messageItem.style.borderColor = '#ccc';
+      
       messageItem.innerHTML = `
         <div class="message-item-header">
           <div>
             <span class="message-sender">${message.anonymousSender}</span>
           </div>
-          <span>→</span>
+          <span style="color: #999;">→</span>
           <div>
             <span class="message-receiver">${message.anonymousReceiver}</span>
           </div>
@@ -221,8 +246,83 @@ function updateArchive() {
         </div>
         <div class="message-timestamp">${message.timestamp}</div>
       `;
-      messageArchiveDiv.appendChild(messageItem);
+      
+      // 클릭 이벤트: 쪽지 펼치기 (오버레이 없이)
+      messageItem.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // 이미 펼쳐진 쪽지가 있으면 닫기
+        const expanded = document.querySelector('.message-item.expanded');
+        if (expanded && expanded !== messageItem) {
+          expanded.classList.remove('expanded');
+        }
+        
+        // 현재 쪽지 펼치기/닫기
+        messageItem.classList.toggle('expanded');
+      });
+      
+      wrapper.appendChild(messageItem);
     });
+    
+    messageArchiveDiv.appendChild(wrapper);
+    
+    // 첫 번째 쪽지를 중앙에 배치
+    setTimeout(() => {
+      const firstItem = wrapper.querySelector('.message-item');
+      if (firstItem) {
+        const scrollLeft = firstItem.offsetLeft - (messageArchiveDiv.offsetWidth / 2) + (firstItem.offsetWidth / 2);
+        messageArchiveDiv.scrollLeft = scrollLeft;
+      }
+    }, 100);
+    
+    // 마우스 호버로 자동 스크롤
+    if (messageArchiveDiv) {
+      let isScrolling = false;
+      let scrollSpeed = 0;
+      
+      messageArchiveDiv.addEventListener('mousemove', function(e) {
+        const rect = messageArchiveDiv.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = rect.width;
+        const edgeThreshold = 150; // 가장자리 감지 범위
+        
+        // 왼쪽 가장자리
+        if (x < edgeThreshold) {
+          scrollSpeed = -((edgeThreshold - x) / edgeThreshold) * 5;
+          if (!isScrolling) startScrolling();
+        }
+        // 오른쪽 가장자리
+        else if (x > width - edgeThreshold) {
+          scrollSpeed = ((x - (width - edgeThreshold)) / edgeThreshold) * 5;
+          if (!isScrolling) startScrolling();
+        }
+        // 중앙
+        else {
+          scrollSpeed = 0;
+          isScrolling = false;
+        }
+      });
+      
+      messageArchiveDiv.addEventListener('mouseleave', function() {
+        scrollSpeed = 0;
+        isScrolling = false;
+      });
+      
+      function startScrolling() {
+        if (isScrolling) return;
+        isScrolling = true;
+        
+        function scroll() {
+          if (!isScrolling || scrollSpeed === 0) {
+            isScrolling = false;
+            return;
+          }
+          messageArchiveDiv.scrollLeft += scrollSpeed;
+          requestAnimationFrame(scroll);
+        }
+        scroll();
+      }
+    }
   }
 }
 
@@ -303,62 +403,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // 3페이지 출력하기 버튼 클릭 이벤트 (바로 출력)
+  // 3페이지 메시지 전송하기 버튼 클릭 이벤트 (바로 출력)
   const printBtn = document.getElementById('printBtn');
   if (printBtn) {
     printBtn.addEventListener('click', autoPrint);
-  }
-
-  // 3페이지 다음 버튼 클릭 이벤트 (출력 건너뛰기)
-  const skipPrintBtn = document.getElementById('skipPrintBtn');
-  if (skipPrintBtn) {
-    skipPrintBtn.addEventListener('click', async function() {
-      const messageText = document.getElementById('messageText').value;
-      
-      if (!messageText.trim()) {
-        alert('메시지를 입력해주세요.');
-        return;
-      }
-      
-      const senderName = document.getElementById('displaySenderName').textContent;
-      const receiverName = document.getElementById('displayReceiverName').textContent;
-      const senderPhone = document.getElementById('senderPhone').value;
-      const receiverPhone = document.getElementById('receiverPhone').value;
-      
-      // 훼손된 메시지 생성
-      const damagedMessage = damageMessage(messageText);
-      
-      // 익명 닉네임 생성
-      const anonymousSender = generateAnonymousName();
-      const anonymousReceiver = generateAnonymousName();
-      
-      // 아카이브용 데이터
-      const archiveData = {
-        id: Date.now(),
-        anonymousSender: anonymousSender,
-        anonymousReceiver: anonymousReceiver,
-        damagedMessage: damagedMessage,
-        timestamp: new Date().toLocaleString('ko-KR')
-      };
-      
-      // Google Sheets용 데이터
-      const sheetsData = {
-        senderName: senderName,
-        senderPhone: senderPhone,
-        receiverName: receiverName,
-        receiverPhone: receiverPhone,
-        originalMessage: messageText,
-        damagedMessage: damagedMessage
-      };
-      
-      // 데이터 저장
-      messageArchive.push(archiveData);
-      localStorage.setItem('messageArchive', JSON.stringify(messageArchive));
-      await sendToGoogleSheets(sheetsData);
-      
-      // 바로 다음 페이지로 이동
-      showPage('page4');
-    });
   }
 
   // 수거완료 버튼 클릭 이벤트
