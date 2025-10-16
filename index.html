@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slow Message</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <!-- 이전 버튼 -->
+  <button id="prevBtn" class="prev-btn" style="display: none;">← 이전</button>
+
+  <!-- 첫 번째 페이지: 인포메이션 -->
+  <div id="page1" class="page active">
+    <header>
+      <h1 class="title">Slow message</h1>
+    </header> 
+
+    <main>
+      <div class="layer1">
+        <p>안녕. 이 웹은 여러분이 가장 흔하게 사용하고 있을 소통의 방식과는 다른 방식을 택하여 메세지를 보내볼 거예요.
+        자동화되어있으며, 완전하고, 재빠른 기존의 <span class="clickable-text">'메세지를 보내는법'</span>과는 다르게 느리고... 완전하지 못하고... 수많은 노동이 개입되어었습니다
+        당신이 만약 이러한 과정이 흥미롭게 느껴진다면, 또는 그저 경험해보고싶다면, 위의 파란색 구를 클릭하세요. 
+       </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- 두 번째 페이지: 발신자/수신자 정보 입력 -->
+  <div id="page2" class="page">
+    <header>
+      <h1 class="title">정보 입력</h1>
+    </header>
+
+    <main>
+      <form id="userInfoForm" class="form-container" autocomplete="off">
+        <div class="form-group">
+          <label for="senderName">발신자 이름</label>
+          <input type="text" id="senderName" name="senderName" autocomplete="off" required>
+        </div>
+
+        <div class="form-group">
+          <label for="senderPhone">발신자 전화번호</label>
+          <input type="tel" id="senderPhone" name="senderPhone" autocomplete="off" required>
+        </div>
+
+        <div class="form-group">
+          <label for="receiverName">수신자 이름</label>
+          <input type="text" id="receiverName" name="receiverName" autocomplete="off" required>
+        </div>
+
+        <div class="form-group">
+          <label for="receiverPhone">수신자 전화번호</label>
+          <input type="tel" id="receiverPhone" name="receiverPhone" autocomplete="off" required>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="privacyConsent" name="privacyConsent" required>
+          <label for="privacyConsent">개인정보 이용에 동의합니다</label>
+        </div>
+
+        <button type="submit" class="next-btn">다음</button>
+      </form>
+    </main>
+  </div>
+
+  <!-- 세 번째 페이지: 메시지 작성 -->
+  <div id="page3" class="page">
+    <header>
+      <h1 class="title">메시지 작성</h1>
+    </header>
+
+    <main>
+      <div class="message-container">
+        <div class="message-info">
+          <p><strong>발신자:</strong> <span id="displaySenderName"></span></p>
+          <p><strong>수신자:</strong> <span id="displayReceiverName"></span></p>
+        </div>
+
+        <div class="notice-box">
+          <p>전시가 끝난 후 이 메시지들은 작가(류단아)의 노동을 거쳐 수신자에게 문자로 보내집니다. 작가가 메시지를 손으로 옮기는 과정에서 비방의 메시지는 옮기지 않습니다.</p>
+        </div>
+
+        <div class="notice-box">
+          <p>작성된 메세지는 추후 페이지에서 익명화 되어 아카이빙 됩니다.</p>
+        </div>
+
+      
+        <div class="form-group">
+          <label for="messageText">메시지를 입력하세요 (50자 제한)</label>
+          <textarea id="messageText" name="messageText" maxlength="50" placeholder="메시지를 입력하세요..." required></textarea>
+          <div class="char-count">
+            <span id="charCount">0</span>/50
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="printBtn" class="print-btn">출력하기</button>
+          <button id="skipPrintBtn" class="skip-btn">다음</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 숨겨진 출력용 영역 -->
+  <div id="printableArea" style="display: none;">
+    <h2 style="text-align: center; margin-bottom: 30px;">Slow Message</h2>
+    <div class="print-info-box">
+      <p><strong>발신자:</strong> <span id="printSenderName"></span></p>
+      <p><strong>수신자:</strong> <span id="printReceiverName"></span></p>
+    </div>
+    <div class="print-message-box">
+      <h3>메시지:</h3>
+      <p id="printMessageContent" class="print-message-text"></p>
+    </div>
+    <div class="print-footer">
+      <p>이 메시지는 Slow Message 시스템을 통해 전송되었습니다.</p>
+      <p>일부 내용은 전송 과정에서 손상되었을 수 있습니다.</p>
+    </div>
+  </div>
+
+  <!-- 네 번째 페이지: 수거 정보 -->
+  <div id="page4" class="page">
+    <header>
+      <h1 class="title">수거 안내</h1>
+    </header>
+
+    <main>
+      <div class="info-container">
+        <div class="info-content">
+          <p>메시지가 성공적으로 출력되었습니다.</p>
+          <p>이제 이 메시지는 물리적인 형태로 존재하게 되었습니다.</p>
+          <p>전통적인 방식으로 메시지를 전달하는 과정을 경험해보세요.</p>
+          <p>메시지는 수거되어 전달될 예정입니다.</p>
+        </div>
+        <button id="collectBtn" class="collect-btn">수거완료</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- 다섯 번째 페이지: 메시지 아카이브 -->
+  <div id="page5" class="page">
+    <header>
+      <h1 class="title">메시지 아카이브</h1>
+    </header>
+
+    <main>
+      <div class="archive-container">
+        <div class="archive-header">
+          <h2>류단아가 보내야할 메시지 <span id="messageCount">0</span>개</h2>
+        </div>
+        <div id="messageArchive" class="message-archive">
+          <!-- 저장된 메시지들이 여기에 표시됩니다 -->
+        </div>
+        <button id="nextFromArchiveBtn" class="next-btn">다음</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- 여섯 번째 페이지: 추가 정보 -->
+  <div id="page6" class="page">
+    <header>
+      <h1 class="title">전달 과정</h1>
+    </header>
+
+    <main>
+      <div class="info-container">
+        <div class="info-content">
+          <p>수집된 메시지들은 이제 전달 과정을 거치게 됩니다.</p>
+          <p>각각의 메시지는 손으로 직접 전달될 예정입니다.</p>
+          <p>디지털이 아닌 아날로그 방식으로, 느리지만 진심 어린 방법으로요.</p>
+          <p>이 과정에서 메시지는 더 많은 의미를 갖게 됩니다.</p>
+        </div>
+        <button id="finalNextBtn" class="next-btn">다음</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- 일곱 번째 페이지: 완료 정보 -->
+  <div id="page7" class="page">
+    <header>
+      <h1 class="title">완료</h1>
+    </header>
+
+    <main>
+      <div class="completion-container">
+        <div class="completion-content">
+          <p>메시지 전송 과정이 완료되었습니다.</p>
+          <p>느린 메시지의 여정을 경험해주셔서 감사합니다.</p>
+          <p>다른 사용자도 이 경험을 할 수 있도록 처음부터 다시 시작해보세요.</p>
+        </div>
+        <button id="resetBtn" class="reset-btn">처음으로 돌아가기</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
