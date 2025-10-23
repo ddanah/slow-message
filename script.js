@@ -2,6 +2,141 @@
 let currentPage = 1;
 let messageArchive = JSON.parse(localStorage.getItem('messageArchive')) || [];
 
+// 현재 날짜와 시간 표시 함수
+function updateDateTime() {
+  const now = new Date();
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    weekday: 'long'
+  };
+  const dateTimeString = now.toLocaleDateString('en-US', options);
+  
+  const dateTimeElements = document.querySelectorAll('#currentDateTime');
+  dateTimeElements.forEach(element => {
+    element.textContent = dateTimeString;
+  });
+}
+
+// 폼 데이터 저장 함수
+function saveFormData() {
+  const senderName = document.getElementById('senderName').value;
+  const senderPhone = document.getElementById('senderPhone').value;
+  const receiverName = document.getElementById('receiverName').value;
+  const receiverPhone = document.getElementById('receiverPhone').value;
+  
+  const formData = {
+    senderName: senderName,
+    senderPhone: senderPhone,
+    receiverName: receiverName,
+    receiverPhone: receiverPhone
+  };
+  
+  localStorage.setItem('messageFormData', JSON.stringify(formData));
+  console.log('폼 데이터 저장됨:', formData);
+}
+
+// 저장된 폼 데이터 로드 함수
+function loadFormData() {
+  const savedData = localStorage.getItem('messageFormData');
+  if (savedData) {
+    const formData = JSON.parse(savedData);
+    return formData;
+  }
+  return null;
+}
+
+// 발신자/수신자 정보 표시 함수
+function displayContactInfo() {
+  const formData = loadFormData();
+  if (formData) {
+    console.log('저장된 폼 데이터:', formData);
+    
+    // 발신자 정보 표시 (3페이지)
+    const displaySenderName = document.getElementById('displaySenderName');
+    const displaySenderPhone = document.getElementById('displaySenderPhone');
+    if (displaySenderName) {
+      displaySenderName.textContent = formData.senderName;
+      console.log('발신자 이름 표시:', formData.senderName);
+    }
+    if (displaySenderPhone) {
+      displaySenderPhone.textContent = formData.senderPhone;
+      console.log('발신자 전화번호 표시:', formData.senderPhone);
+    }
+    
+    // 수신자 정보 표시 (3페이지)
+    const displayReceiverName = document.getElementById('displayReceiverName');
+    const displayReceiverPhone = document.getElementById('displayReceiverPhone');
+    if (displayReceiverName) {
+      displayReceiverName.textContent = formData.receiverName;
+      console.log('수신자 이름 표시:', formData.receiverName);
+    }
+    if (displayReceiverPhone) {
+      displayReceiverPhone.textContent = formData.receiverPhone;
+      console.log('수신자 전화번호 표시:', formData.receiverPhone);
+    }
+    
+    // 4페이지 발신자/수신자 정보 표시
+    const displaySenderName4 = document.getElementById('displaySenderName4');
+    const displaySenderPhone4 = document.getElementById('displaySenderPhone4');
+    const displayReceiverName4 = document.getElementById('displayReceiverName4');
+    const displayReceiverPhone4 = document.getElementById('displayReceiverPhone4');
+    
+    if (displaySenderName4) displaySenderName4.textContent = formData.senderName;
+    if (displaySenderPhone4) displaySenderPhone4.textContent = formData.senderPhone;
+    if (displayReceiverName4) displayReceiverName4.textContent = formData.receiverName;
+    if (displayReceiverPhone4) displayReceiverPhone4.textContent = formData.receiverPhone;
+    
+    // 메시지 표시
+    const displayMessageText = document.getElementById('displayMessageText');
+    const messageText = document.getElementById('messageText');
+    if (displayMessageText && messageText) {
+      displayMessageText.textContent = messageText.value;
+    }
+    
+    // 발신자 정보 표시 (다른 페이지)
+    const senderInfo = document.querySelector('.sender-info');
+    if (senderInfo) {
+      senderInfo.innerHTML = `
+        <div class="sender-label">발신자</div>
+        <div class="contact-display">${formData.senderName}</div>
+        <div class="contact-display">${formData.senderPhone}</div>
+      `;
+    }
+    
+    // 수신자 정보 표시 (다른 페이지)
+    const receiverInfo = document.querySelector('.receiver-info');
+    if (receiverInfo) {
+      receiverInfo.innerHTML = `
+        <div class="receiver-label">수신자</div>
+        <div class="contact-display">${formData.receiverName}</div>
+        <div class="contact-display">${formData.receiverPhone}</div>
+      `;
+    }
+  } else {
+    console.log('저장된 폼 데이터가 없습니다.');
+  }
+}
+
+// 진행 절차 업데이트 함수
+function updateProgress() {
+  const progressSteps = document.querySelectorAll('.progress-step');
+  progressSteps.forEach(step => {
+    const stepNumber = parseInt(step.getAttribute('data-step'));
+    step.classList.remove('active', 'completed');
+    
+    if (stepNumber === currentPage) {
+      step.classList.add('active');
+    } else if (stepNumber < currentPage) {
+      step.classList.add('completed');
+    }
+  });
+}
+
 // 익명 닉네임 생성 함수
 function generateAnonymousName() {
   const adjectives = [
@@ -64,16 +199,20 @@ function showPage(pageId) {
     targetPage.classList.add('active');
   }
   
-  // 이전 버튼 표시/숨김
-  const prevBtn = document.getElementById('prevBtn');
-  if (pageId === 'page1') {
-    prevBtn.style.display = 'none';
-  } else {
-    prevBtn.style.display = 'block';
-  }
   
   // 현재 페이지 업데이트
   currentPage = parseInt(pageId.replace('page', ''));
+  
+  // 날짜/시간 업데이트
+  updateDateTime();
+  
+  // 3페이지 이상에서는 연락처 정보 표시
+  if (currentPage >= 3) {
+    displayContactInfo();
+  }
+  
+  // 진행 절차 업데이트
+  updateProgress();
 }
 
 // 이전 페이지로 이동
@@ -155,7 +294,7 @@ async function autoPrint() {
     if (!alertShown) {
       alertShown = true;
       alert('메시지가 훼손되었습니다! 펜을 이용하여 훼손된 메시지를 복구해주세요');
-      showPage('page4');
+      showPage('page5');
     }
   };
   
@@ -191,11 +330,10 @@ async function autoPrint() {
   }, 3000);
 }
 
-// 아카이브 업데이트 (쪽지 쌓기 효과)
+// 아카이브 업데이트 (포스트잇 형태)
 function updateArchive() {
   const messageCount = document.getElementById('messageCount');
   const messageArchiveDiv = document.getElementById('messageArchive');
-  const overlay = document.getElementById('archiveOverlay');
   
   if (messageCount) {
     messageCount.textContent = messageArchive.length;
@@ -204,136 +342,133 @@ function updateArchive() {
   if (messageArchiveDiv) {
     messageArchiveDiv.innerHTML = '';
     
-    // wrapper 생성
-    const wrapper = document.createElement('div');
-    wrapper.className = 'message-archive-wrapper';
-    
-    // 무채색 배경 배열
-    const backgrounds = [
-      '#f5f5f5',
-      '#e8e8e8',
-      '#ffffff',
-      '#ebebeb',
-      '#f0f0f0',
-      '#e5e5e5',
-      '#fafafa',
-      '#ededed',
+    // 포스트잇 색상 배열 (그레이 스케일 기반)
+    const colors = [
+      '#007BFF', // 기본
+      '#1a8cff', // 밝은 1
+      '#0066cc', // 어두운 1
+      '#3399ff', // 밝은 2
+      '#0052a3', // 어두운 2
+      '#4da6ff', // 밝은 3
+      '#004080', // 어두운 3
+      '#66b3ff', // 밝은 4
     ];
     
+    // 최근 메시지가 위에 오도록 역순으로 처리 (낮은 인덱스 = 낮은 z-index)
     messageArchive.forEach((message, index) => {
-      const messageItem = document.createElement('div');
-      messageItem.className = 'message-item';
+      const note = document.createElement('div');
+      note.className = 'archive-note';
+      
+      // 무작위 위치 설정 (오른쪽 섹션 내부)
+      const randomTop = Math.random() * 60 + 5; // 5% ~ 65%
+      const randomLeft = Math.random() * 70 + 5; // 5% ~ 75%
       
       // 랜덤 회전 효과
-      const rotation = (Math.random() - 0.5) * 4; // -2도 ~ 2도 랜덤 회전
+      const rotation = (Math.random() - 0.5) * 10; // -5도 ~ 5도
       
-      messageItem.style.transform = `rotate(${rotation}deg)`;
-      messageItem.style.background = backgrounds[index % backgrounds.length];
-      messageItem.style.borderColor = '#ccc';
+      // z-index: 최근 것일수록 높게 (배열의 뒤쪽이 최근)
+      const zIndex = index + 1;
       
-      messageItem.innerHTML = `
-        <div class="message-item-header">
-          <div>
-            <span class="message-sender">${message.anonymousSender}</span>
-          </div>
-          <span style="color: #999;">→</span>
-          <div>
-            <span class="message-receiver">${message.anonymousReceiver}</span>
-          </div>
+      note.style.top = `${randomTop}%`;
+      note.style.left = `${randomLeft}%`;
+      note.style.transform = `rotate(${rotation}deg)`;
+      note.style.backgroundColor = colors[index % colors.length];
+      note.style.zIndex = zIndex;
+      
+      note.innerHTML = `
+        <div class="archive-note-close">×</div>
+        <div class="archive-note-header">
+          ${message.anonymousSender} → ${message.anonymousReceiver}
         </div>
-        <div class="message-content">
-          <div class="message-damaged">${message.damagedMessage}</div>
+        <div class="archive-note-content">
+          ${message.damagedMessage}
         </div>
-        <div class="message-timestamp">${message.timestamp}</div>
+        <div class="archive-note-time">${message.timestamp}</div>
       `;
       
-      // 클릭 이벤트: 쪽지 펼치기 (오버레이 없이)
-      messageItem.addEventListener('click', function(e) {
+      // X 버튼 클릭 이벤트
+      const closeBtn = note.querySelector('.archive-note-close');
+      closeBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        
-        // 이미 펼쳐진 쪽지가 있으면 닫기
-        const expanded = document.querySelector('.message-item.expanded');
-        if (expanded && expanded !== messageItem) {
-          expanded.classList.remove('expanded');
-        }
-        
-        // 현재 쪽지 펼치기/닫기
-        messageItem.classList.toggle('expanded');
+        note.style.display = 'none';
       });
       
-      wrapper.appendChild(messageItem);
+      messageArchiveDiv.appendChild(note);
     });
-    
-    messageArchiveDiv.appendChild(wrapper);
-    
-    // 첫 번째 쪽지를 중앙에 배치
-    setTimeout(() => {
-      const firstItem = wrapper.querySelector('.message-item');
-      if (firstItem) {
-        const scrollLeft = firstItem.offsetLeft - (messageArchiveDiv.offsetWidth / 2) + (firstItem.offsetWidth / 2);
-        messageArchiveDiv.scrollLeft = scrollLeft;
-      }
-    }, 100);
-    
-    // 마우스 호버로 자동 스크롤
-    if (messageArchiveDiv) {
-      let isScrolling = false;
-      let scrollSpeed = 0;
-      
-      messageArchiveDiv.addEventListener('mousemove', function(e) {
-        const rect = messageArchiveDiv.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const width = rect.width;
-        const edgeThreshold = 150; // 가장자리 감지 범위
-        
-        // 왼쪽 가장자리
-        if (x < edgeThreshold) {
-          scrollSpeed = -((edgeThreshold - x) / edgeThreshold) * 5;
-          if (!isScrolling) startScrolling();
-        }
-        // 오른쪽 가장자리
-        else if (x > width - edgeThreshold) {
-          scrollSpeed = ((x - (width - edgeThreshold)) / edgeThreshold) * 5;
-          if (!isScrolling) startScrolling();
-        }
-        // 중앙
-        else {
-          scrollSpeed = 0;
-          isScrolling = false;
-        }
-      });
-      
-      messageArchiveDiv.addEventListener('mouseleave', function() {
-        scrollSpeed = 0;
-        isScrolling = false;
-      });
-      
-      function startScrolling() {
-        if (isScrolling) return;
-        isScrolling = true;
-        
-        function scroll() {
-          if (!isScrolling || scrollSpeed === 0) {
-            isScrolling = false;
-            return;
-          }
-          messageArchiveDiv.scrollLeft += scrollSpeed;
-          requestAnimationFrame(scroll);
-        }
-        scroll();
-      }
-    }
   }
 }
 
 // 리셋 기능
 function resetToBeginning() {
   // 모든 폼 초기화
-  document.getElementById('userInfoForm').reset();
-  document.getElementById('messageText').value = '';
-  document.getElementById('charCount').textContent = '0';
+  const userInfoForm = document.getElementById('userInfoForm');
+  if (userInfoForm) {
+    userInfoForm.reset();
+  }
   
-  // 첫 번째 페이지로 이동
+  const messageText = document.getElementById('messageText');
+  if (messageText) {
+    messageText.value = '';
+  }
+  
+  const charCount = document.getElementById('charCount');
+  if (charCount) {
+    charCount.textContent = '0';
+  }
+  
+  // localStorage에서 저장된 폼 데이터 삭제
+  localStorage.removeItem('messageFormData');
+  
+  // 페이지 3, 4에 표시된 정보 초기화
+  const displayFields = [
+    'displaySenderName',
+    'displaySenderPhone',
+    'displayReceiverName',
+    'displayReceiverPhone'
+  ];
+  
+  displayFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.textContent = '';
+    }
+  });
+  
+  // 메시지 표시 영역 초기화
+  const messageDisplay = document.getElementById('messageDisplay');
+  if (messageDisplay) {
+    messageDisplay.textContent = '';
+  }
+  
+  // 프린트 상태 초기화
+  isPrinted = false;
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
+  if (sendMessageBtn) {
+    sendMessageBtn.textContent = '메세지 전송하기';
+  }
+  
+  // 개인정보 동의 포스트잇 다시 표시 (page2)
+  const privacyPostitContainer = document.getElementById('privacyPostitContainer');
+  if (privacyPostitContainer) {
+    privacyPostitContainer.style.display = 'flex';
+  }
+  
+  const formContent = document.getElementById('formContent');
+  if (formContent) {
+    formContent.style.display = 'none';
+  }
+  
+  // 메인 포스트잇 다시 표시 (page1)
+  const postitContainer = document.getElementById('postitContainer');
+  const postitPlaceholder = document.getElementById('postitPlaceholder');
+  if (postitContainer) {
+    postitContainer.style.display = 'flex';
+  }
+  if (postitPlaceholder) {
+    postitPlaceholder.style.display = 'none';
+  }
+  
+  // 첫 번째 페이지(메인 페이지)로 이동
   showPage('page1');
 }
 
@@ -418,21 +553,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // 아카이브에서 다음 버튼 클릭 이벤트
-  const nextFromArchiveBtn = document.getElementById('nextFromArchiveBtn');
-  if (nextFromArchiveBtn) {
-    nextFromArchiveBtn.addEventListener('click', function() {
-      showPage('page6');
-    });
-  }
 
-  // 여섯 번째 페이지에서 다음 버튼 클릭 이벤트
-  const finalNextBtn = document.getElementById('finalNextBtn');
-  if (finalNextBtn) {
-    finalNextBtn.addEventListener('click', function() {
-      showPage('page7');
-    });
-  }
 
   // 리셋 버튼 클릭 이벤트
   const resetBtn = document.getElementById('resetBtn');
@@ -442,4 +563,120 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 페이지 로드 시 아카이브 업데이트
   updateArchive();
+  
+  // 페이지 로드 시 날짜시간 업데이트 및 1초마다 갱신
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+  
+  // 포스트잇 X 버튼 클릭 이벤트
+  const postitClose = document.getElementById('postitClose');
+  const postitContainer = document.getElementById('postitContainer');
+  const postitPlaceholder = document.getElementById('postitPlaceholder');
+  
+  if (postitClose && postitContainer && postitPlaceholder) {
+    postitClose.addEventListener('click', function() {
+      postitContainer.style.display = 'none';
+      postitPlaceholder.style.display = 'block';
+    });
+  }
+  
+  // 포스트잇 붙이기 클릭 이벤트
+  const postitPlaceholderText = postitPlaceholder?.querySelector('.clickable-text');
+  if (postitPlaceholderText) {
+    postitPlaceholderText.addEventListener('click', function() {
+      postitContainer.style.display = 'block';
+      postitPlaceholder.style.display = 'none';
+    });
+  }
+  
+  // Back 버튼 클릭 이벤트 (상단) - 이전 페이지로
+  const topBackButtons = document.querySelectorAll('.top-right-container .back-button');
+  topBackButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      if (currentPage > 1) {
+        const prevPageId = `page${currentPage - 1}`;
+        showPage(prevPageId);
+      }
+    });
+  });
+  
+  // Next 버튼 클릭 이벤트 (하단) - 다음 페이지로
+  const bottomNextButtons = document.querySelectorAll('.bottom-right-container .back-button');
+  bottomNextButtons.forEach(button => {
+    // resetBtn은 제외
+    if (button.id === 'resetBtn') return;
+    
+    button.addEventListener('click', function() {
+      if (currentPage === 2) {
+        // 두 번째 페이지에서 폼 정보 저장
+        saveFormData();
+      }
+      if (currentPage < 8) {
+        const nextPageId = `page${currentPage + 1}`;
+        showPage(nextPageId);
+      }
+    });
+  });
+  
+  // 개인정보 동의 X 버튼 클릭 이벤트
+  const privacyCloseBtn = document.querySelector('.privacy-postit-close');
+  const privacyPostitContainer = document.getElementById('privacyPostitContainer');
+  const formContent = document.getElementById('formContent');
+  
+  if (privacyCloseBtn && privacyPostitContainer && formContent) {
+    privacyCloseBtn.addEventListener('click', function() {
+      privacyPostitContainer.style.display = 'none';
+      formContent.style.display = 'block';
+    });
+  }
+  
+  // 안내 포스트잇 닫기 이벤트
+  const noticeCloseButtons = document.querySelectorAll('.notice-postit-close');
+  noticeCloseButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const postit = this.closest('.notice-postit-container');
+      if (postit) {
+        postit.style.display = 'none';
+      }
+    });
+  });
+  
+  // 메세지 전송하기 버튼 클릭 이벤트
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
+  if (sendMessageBtn) {
+    let isPrinted = false;
+    
+    sendMessageBtn.addEventListener('click', function() {
+      if (!isPrinted) {
+        // 첫 클릭: 출력
+        window.print();
+        
+        // 출력 후 버튼 텍스트를 "Next"로 변경
+        window.addEventListener('afterprint', function() {
+          sendMessageBtn.textContent = 'Next';
+          isPrinted = true;
+        }, { once: true });
+        
+        // Safari 지원
+        const mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql) {
+          if (!mql.matches) {
+            sendMessageBtn.textContent = 'Next';
+            isPrinted = true;
+          }
+        });
+        
+        // fallback: 일정 시간 후 자동으로 변경
+        setTimeout(function() {
+          if (!isPrinted) {
+            sendMessageBtn.textContent = 'Next';
+            isPrinted = true;
+          }
+        }, 1000);
+      } else {
+        // 두 번째 클릭: 다음 페이지로 이동
+        showPage('page5');
+      }
+    });
+  }
 });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Slow Message</title>
+  <title>Incomplete Message</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -11,96 +11,161 @@
 </head>
 
 <body>
-  <!-- 이전 버튼 -->
-  <button id="prevBtn" class="prev-btn" style="display: none;">← 이전</button>
 
   <!-- 첫 번째 페이지: 인포메이션 -->
   <div id="page1" class="page active">
-    <header>
-      <h1 class="title">Slow message</h1>
-    </header> 
-
-    <main>
-      <div class="layer1">
-        <p>안녕. 이 웹은 여러분이 가장 흔하게 사용하고 있을 소통의 방식과는 다른 방식을 택하여 메세지를 보내볼 거예요.
-        자동화되어있으며, 완전하고, 재빠른 기존의 <span class="clickable-text">'메세지를 보내는법'</span>과는 다르게 느리고... 완전하지 못하고... 수많은 노동이 개입되어었습니다
-        당신이 만약 이러한 과정이 흥미롭게 느껴진다면, 또는 그저 경험해보고싶다면, 위의 파란색 구를 클릭하세요. 
-       </p>
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">Incomplete Message</h1>
+        </div>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
+        </div>
       </div>
-    </main>
+      
+      <!-- 오른쪽: 설명 -->
+      <div class="right-section">
+        <div class="postit-container" id="postitContainer">
+          <div class="postit">
+            <div class="postit-close" id="postitClose">×</div>
+            <div class="postit-content">
+              <p>
+              불완전한 메세지를 보내보세요.
+              그렇지만 당신이 전달하고자 하는 마음은 완전하게 도착할 것입니다.
+              이 웹은 즉각적이고 완전한 소통이 일상이 된 지금,
+              조금 다른 방식으로 <span class="clickable-text">메세지를 전송</span>하는 경험을 제안합니다.
+              여기에서의 메세지는 완벽하게 도착하지 않을 수도 있으며,
+              때로는 일부가 손상되거나 지연될 수도 있습니다.
+              
+              그러나 그 느림과 불완전함 속에는
+              자동화된 과정 속에서 사라졌던 인간적인 흔적이 남습니다.
+              당신의 손과 시간, 그리고 기다림이 개입된 이 작은 행위가
+              소통의 또 다른 형태가 되기를 바랍니다.
+              위의 "메세지를 전송" 문구를 클릭하면,
+              이 여정이 조용히 시작됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="postit-placeholder" id="postitPlaceholder" style="display: none;">
+          <p class="clickable-text no-underline">포스트잇 다시 붙이기</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 두 번째 페이지: 발신자/수신자 정보 입력 -->
   <div id="page2" class="page">
-    <header>
-      <h1 class="title">정보 입력</h1>
-    </header>
-
-    <main>
-      <form id="userInfoForm" class="form-container" autocomplete="off">
-        <div class="form-group">
-          <label for="senderName">발신자 이름</label>
-          <input type="text" id="senderName" name="senderName" autocomplete="off" required>
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">1</h1>
         </div>
-
-        <div class="form-group">
-          <label for="senderPhone">발신자 전화번호</label>
-          <input type="tel" id="senderPhone" name="senderPhone" autocomplete="off" required>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
         </div>
-
-        <div class="form-group">
-          <label for="receiverName">수신자 이름</label>
-          <input type="text" id="receiverName" name="receiverName" autocomplete="off" required>
+      </div>
+      
+      <!-- 오른쪽: 폼 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
         </div>
-
-        <div class="form-group">
-          <label for="receiverPhone">수신자 전화번호</label>
-          <input type="tel" id="receiverPhone" name="receiverPhone" autocomplete="off" required>
+        <div class="privacy-postit-container" id="privacyPostitContainer">
+          <div class="privacy-postit">
+            <div class="privacy-postit-close">×</div>
+            <div class="privacy-postit-content">
+              <p>진행 시 개인정보 이용에 동의한 것으로 간주됩니다.</p>
+            </div>
+          </div>
         </div>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="privacyConsent" name="privacyConsent" required>
-          <label for="privacyConsent">개인정보 이용에 동의합니다</label>
+        <div class="content-container" id="formContent" style="display: none;">
+          <form id="userInfoForm" class="form-container" autocomplete="off">
+            <div class="letter-content">
+              <div class="sender-section">
+                <div class="sender-label">발신자</div>
+                <input type="text" id="senderName" name="senderName" placeholder="이름" autocomplete="off" required>
+                <input type="text" id="senderPhone" name="senderPhone" placeholder="010-1234-5678" autocomplete="off" required>
+              </div>
+            </div>
+          </form>
         </div>
-
-        <button type="submit" class="next-btn">다음</button>
-      </form>
-    </main>
+        <div class="receiver-info" aria-label="수신자 정보">
+          <label for="receiverName">수신자</label>
+          <input type="text" id="receiverName" name="receiverName" placeholder="이름" autocomplete="off" required>
+          <input type="text" id="receiverPhone" name="receiverPhone" placeholder="010-1234-5678" autocomplete="off" required>
+        </div>
+        <div class="bottom-right-container">
+          <div class="back-button">Next</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 세 번째 페이지: 메시지 작성 -->
   <div id="page3" class="page">
-    <header>
-      <h1 class="title">메시지 작성</h1>
-    </header>
-
-    <main>
-      <div class="message-container">
-        <div class="message-info">
-          <p><strong>발신자:</strong> <span id="displaySenderName"></span></p>
-          <p><strong>수신자:</strong> <span id="displayReceiverName"></span></p>
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">2</h1>
         </div>
-
-        <div class="notice-box">
-          <p>전시가 끝난 후 이 메시지들은 작가(류단아)의 노동을 거쳐 수신자에게 문자로 보내집니다. 작가가 메시지를 손으로 옮기는 과정에서 비방의 메시지는 옮기지 않습니다.</p>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
         </div>
-
-        <div class="notice-box">
-          <p>작성된 메세지는 추후 페이지에서 익명화 되어 아카이빙 됩니다.</p>
-        </div>
-
+      </div>
       
-        <div class="form-group">
-          <label for="messageText">메시지를 입력하세요 (50자 제한)</label>
-          <textarea id="messageText" name="messageText" maxlength="50" placeholder="메시지를 입력하세요..." required></textarea>
-          <div class="char-count">
-            <span id="charCount">0</span>/50
+      <!-- 오른쪽: 메시지 작성 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
+        </div>
+        <div class="content-container">
+          <div class="letter-content">
+            <div class="sender-section">
+              <div class="sender-label">발신자</div>
+              <div class="contact-display" id="displaySenderName"></div>
+              <div class="contact-display" id="displaySenderPhone"></div>
+            </div>
           </div>
         </div>
-
-        <button id="printBtn" class="print-btn">메시지 전송하기</button>
+        
+        <div class="message-input-section">
+          <textarea id="messageText" name="messageText" placeholder="메세지를 입력하세요. (60자 제한)" maxlength="60" autocomplete="off" required></textarea>
+        </div>
+          
+          <div class="receiver-info" aria-label="수신자 정보">
+            <div class="receiver-label">수신자</div>
+            <div class="contact-display" id="displayReceiverName"></div>
+            <div class="contact-display" id="displayReceiverPhone"></div>
+          </div>
+          
+          <div class="notice-postit-container">
+            <div class="notice-postit">
+              <div class="notice-postit-close">×</div>
+              <div class="notice-postit-content">
+                <p>전시가 끝난 후 이 메시지들은 작가(류단아)의 노동을 거쳐 수신자에게 문자로 보내집니다. 작가가 메시지를 손으로 옮기는 과정에서 비방의 메시지는 옮기지 않습니다.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="notice-postit-container">
+            <div class="notice-postit">
+              <div class="notice-postit-close">×</div>
+              <div class="notice-postit-content">
+                <p>작성된 메세지는 추후 페이지에서 익명화 되어 아카이빙 됩니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-right-container">
+          <div class="back-button">Next</div>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
 
   <!-- 숨겨진 출력용 영역 -->
@@ -122,78 +187,172 @@
 
   <!-- 네 번째 페이지: 수거 정보 -->
   <div id="page4" class="page">
-    <header>
-      <h1 class="title">수거 안내</h1>
-    </header>
-
-    <main>
-      <div class="info-container">
-        <div class="info-content">
-          <p>메시지가 성공적으로 출력되었습니다.</p>
-          <p>이제 이 메시지는 물리적인 형태로 존재하게 되었습니다.</p>
-          <p>전통적인 방식으로 메시지를 전달하는 과정을 경험해보세요.</p>
-          <p>메시지는 수거되어 전달될 예정입니다.</p>
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">3</h1>
         </div>
-        <button id="collectBtn" class="collect-btn">수거완료</button>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
+        </div>
       </div>
-    </main>
+      
+      <!-- 오른쪽: 메시지 전송 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
+        </div>
+        
+        <div class="content-container">
+          <div class="letter-content">
+            <div class="sender-section">
+              <div class="sender-label">발신자</div>
+              <div class="contact-display" id="displaySenderName4"></div>
+              <div class="contact-display" id="displaySenderPhone4"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="message-display-section">
+          <div class="message-display-text" id="displayMessageText"></div>
+        </div>
+        
+        <div class="receiver-info" aria-label="수신자 정보">
+          <div class="receiver-label">수신자</div>
+          <div class="contact-display" id="displayReceiverName4"></div>
+          <div class="contact-display" id="displayReceiverPhone4"></div>
+        </div>
+        
+        <div class="send-message-container">
+          <div class="send-message-text clickable-text" id="sendMessageBtn">메세지 전송하기</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- 다섯 번째 페이지: 메시지 아카이브 -->
+  <!-- 다섯 번째 페이지: 복구 안내 -->
   <div id="page5" class="page">
-    <header>
-      <h1 class="title">메시지 아카이브</h1>
-    </header>
-
-    <main>
-      <div class="archive-container">
-        <div class="archive-header">
-          <h2>류단아가 보내야할 메시지 <span id="messageCount">0</span>개</h2>
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">4</h1>
         </div>
-        <div class="archive-overlay" id="archiveOverlay"></div>
-        <div id="messageArchive" class="message-archive">
-          <!-- 저장된 메시지들이 여기에 표시됩니다 -->
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
         </div>
-        <button id="nextFromArchiveBtn" class="next-btn">다음</button>
       </div>
-    </main>
+      
+      <!-- 오른쪽: 복구 안내 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
+        </div>
+        <div class="content-container">
+          <p>텍스트가 훼손되었습니다!</p>
+          <p>옆에 있는 펜을 사용하여 훼손된 부분을 복구해주세요.</p>
+          <p>복구된 메시지는 수거함에 넣어주시면 무사히 전달됩니다.</p>
+        </div>
+        <div class="bottom-right-container">
+          <div class="back-button">Next</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- 여섯 번째 페이지: 추가 정보 -->
+  <!-- 여섯 번째 페이지: 메시지 아카이브 -->
   <div id="page6" class="page">
-    <header>
-      <h1 class="title">전달 과정</h1>
-    </header>
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">5</h1>
+        </div>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
+        </div>
+      </div>
+      
+      <!-- 오른쪽: 아카이브 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
+        </div>
+        <div class="content-container">
+          <div class="archive-header">
+            <p class="archive-title">쌓인 메세지 <span id="messageCount">0</span>개</p>
+          </div>
+          <div id="messageArchive" class="message-archive">
+            <!-- 저장된 메시지들이 포스트잇 형태로 표시됩니다 -->
+          </div>
+        </div>
+        <div class="bottom-right-container">
+          <div class="back-button">Next</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <main>
-      <div class="info-container">
-        <div class="info-content">
+  <!-- 일곱 번째 페이지: 전달 과정 -->
+  <div id="page7" class="page">
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">6</h1>
+        </div>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
+        </div>
+      </div>
+      
+      <!-- 오른쪽: 전달 과정 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
+        </div>
+        <div class="content-container">
           <p>수집된 메시지들은 이제 전달 과정을 거치게 됩니다.</p>
           <p>각각의 메시지는 손으로 직접 전달될 예정입니다.</p>
           <p>디지털이 아닌 아날로그 방식으로, 느리지만 진심 어린 방법으로요.</p>
           <p>이 과정에서 메시지는 더 많은 의미를 갖게 됩니다.</p>
         </div>
-        <button id="finalNextBtn" class="next-btn">다음</button>
+        <div class="bottom-right-container">
+          <div class="back-button">Next</div>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
 
-  <!-- 일곱 번째 페이지: 완료 정보 -->
-  <div id="page7" class="page">
-    <header>
-      <h1 class="title">완료</h1>
-    </header>
-
-    <main>
-      <div class="completion-container">
-        <div class="completion-content">
+  <!-- 여덟 번째 페이지: 완료 정보 -->
+  <div id="page8" class="page">
+    <div class="split-container">
+      <!-- 왼쪽: 타이틀 -->
+      <div class="left-section">
+        <div class="title-container">
+          <h1 class="main-title">7</h1>
+        </div>
+        <div class="datetime-container">
+          <p id="currentDateTime"></p>
+        </div>
+      </div>
+      
+      <!-- 오른쪽: 완료 정보 -->
+      <div class="right-section">
+        <div class="top-right-container">
+          <div class="back-button">Back</div>
+        </div>
+        <div class="content-container">
           <p>메시지 전송 과정이 완료되었습니다.</p>
           <p>느린 메시지의 여정을 경험해주셔서 감사합니다.</p>
           <p>다른 사용자도 이 경험을 할 수 있도록 처음부터 다시 시작해보세요.</p>
         </div>
-        <button id="resetBtn" class="reset-btn">처음으로 돌아가기</button>
+        <div class="bottom-right-container">
+          <div class="back-button" id="resetBtn">처음으로 돌아가기</div>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
 
   <script src="script.js"></script>
