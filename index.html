@@ -27,6 +27,17 @@
       
       <!-- 오른쪽: 설명 -->
       <div class="right-section">
+        <!-- 두 번째 포스트잇 -->
+        <div class="postit-container-2" id="postitContainer2">
+          <div class="postit postit-2">
+            <div class="postit-close" id="postitClose2">×</div>
+            <div class="postit-content">
+              <a href="https://www.instagram.com/archofd?igsh=MTJ3ODljNG92d25saw%3D%3D&utm_source=qr">@archofd</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 첫 번째 포스트잇 (메인 설명) -->
         <div class="postit-container" id="postitContainer">
           <div class="postit">
             <div class="postit-close" id="postitClose">×</div>
@@ -147,7 +158,8 @@
             <div class="notice-postit">
               <div class="notice-postit-close">×</div>
               <div class="notice-postit-content">
-                <p>전시가 끝난 후 이 메시지들은 작가(류단아)의 노동을 거쳐 수신자에게 문자로 보내집니다. 작가가 메시지를 손으로 옮기는 과정에서 비방의 메시지는 옮기지 않습니다.</p>
+                <p>입력된 메세지는 전시 종료 후, 수작업 과정을 거쳐 수신자에게 문자로 전달됩니다.
+                  이 과정에서 <u><i>비방이나 부적절한 내용은 옮겨지지 않습니다.</i></u></p>
               </div>
             </div>
           </div>
@@ -156,7 +168,7 @@
             <div class="notice-postit">
               <div class="notice-postit-close">×</div>
               <div class="notice-postit-content">
-                <p>작성된 메세지는 추후 페이지에서 익명화 되어 아카이빙 됩니다.</p>
+                <p>작성된 메세지는 이후 페이지에서 <u><i>익명화</i></u> 되어 아카이빙 됩니다.</p>
               </div>
             </div>
           </div>
@@ -170,7 +182,7 @@
 
   <!-- 숨겨진 출력용 영역 -->
   <div id="printableArea" style="display: none;">
-    <h2 style="text-align: center; margin-bottom: 30px;">Slow Message</h2>
+    <h2 style="text-align: center; margin-bottom: 30px;">Incomplete Message</h2>
     <div class="print-info-box">
       <p><strong>발신자:</strong> <span id="printSenderName"></span></p>
       <p><strong>수신자:</strong> <span id="printReceiverName"></span></p>
@@ -180,8 +192,7 @@
       <p id="printMessageContent" class="print-message-text"></p>
     </div>
     <div class="print-footer">
-      <p>이 메시지는 Slow Message 시스템을 통해 전송되었습니다.</p>
-      <p>일부 내용은 전송 과정에서 손상되었을 수 있습니다.</p>
+      <p>이 메시지는 Incomplete Message 시스템을 통해 전송되었습니다.</p>
     </div>
   </div>
 
@@ -250,9 +261,9 @@
           <div class="back-button">Back</div>
         </div>
         <div class="content-container">
-          <p>텍스트가 훼손되었습니다!</p>
-          <p>옆에 있는 펜을 사용하여 훼손된 부분을 복구해주세요.</p>
-          <p>복구된 메시지는 수거함에 넣어주시면 무사히 전달됩니다.</p>
+          <p>전송중 예기치 않은 오류가 발생했습니다.</p>
+          <p>아래의 펜을 사용하여 훼손된 부분을 복구해주세요.</p>
+          <p>복구된 메시지는 <u><i>수거함에 넣어주시면</i></u> 무사히 전달됩니다.</p>
         </div>
         <div class="bottom-right-container">
           <div class="back-button">Next</div>
@@ -313,10 +324,13 @@
           <div class="back-button">Back</div>
         </div>
         <div class="content-container">
-          <p>수집된 메시지들은 이제 전달 과정을 거치게 됩니다.</p>
-          <p>각각의 메시지는 손으로 직접 전달될 예정입니다.</p>
-          <p>디지털이 아닌 아날로그 방식으로, 느리지만 진심 어린 방법으로요.</p>
-          <p>이 과정에서 메시지는 더 많은 의미를 갖게 됩니다.</p>
+          <p>메세지 전송이 완료되었습니다.</p>
+          <p>입력하신 메세지는 저장되었으며, 전시 종료 후 손으로 옮겨져 문자로 발송될 예정입니다.</p>
+          <br>
+          <p>이 과정은 빠르지도, 완벽하지도 않습니다.</p>
+          <p>그러나 그 투박한 느림 속에는 손의 온도와 시간의 흔적이 남습니다.</p>
+          <p>디지털이 지워온 마찰을 잠시 복원하며,</p>
+          <p>당신의 메세지가 가장 인간적인 방식으로 도착하기를 바랍니다.</p>
         </div>
         <div class="bottom-right-container">
           <div class="back-button">Next</div>
@@ -343,10 +357,9 @@
         <div class="top-right-container">
           <div class="back-button">Back</div>
         </div>
-        <div class="content-container">
-          <p>메시지 전송 과정이 완료되었습니다.</p>
-          <p>느린 메시지의 여정을 경험해주셔서 감사합니다.</p>
-          <p>다른 사용자도 이 경험을 할 수 있도록 처음부터 다시 시작해보세요.</p>
+        <div class="content-container"> 
+          <p>참여해주셔서 감사합니다.</p>
+          <p>불완전하지만 완전한 메세지가 도착하기까지 잠시만 기다려주세요.</p>
         </div>
         <div class="bottom-right-container">
           <div class="back-button" id="resetBtn">처음으로 돌아가기</div>

@@ -100,11 +100,12 @@ body {
 }
 
 .datetime-container p {
-  font-size: 4rem;
+  font-size: 2.5rem;
   color: #666;
   margin: 0;
   font-weight: 300;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .top-right-container {
@@ -151,6 +152,7 @@ body {
   cursor: pointer;
   line-height: 1;
   font-weight: bold;
+  z-index: 10;
 }
 
 .privacy-postit-close:hover {
@@ -187,6 +189,7 @@ body {
   cursor: pointer;
   font-weight: bold;
   line-height: 1;
+  z-index: 10;
 }
 
 .postit-close:hover {
@@ -211,6 +214,38 @@ body {
   line-height: 1.8;
   color: #444;
   margin: 0;
+}
+
+/* 두 번째 포스트잇 스타일 */
+.postit-container-2 {
+  position: absolute;
+  top: 400px;
+  right: 155px;
+  max-width: 200px;
+  z-index: 5;
+}
+
+.postit-2 {
+  background-color: #007BFF;
+  padding: 15px 20px;
+  border-radius: 0;
+  position: relative;
+}
+
+.postit-2 .postit-content p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: white;
+  margin: 0;
+}
+
+.postit-2 .postit-content a {
+  color: white;
+  text-decoration: none;
+}
+
+.postit-2 .postit-content a:hover {
+  text-decoration: underline;
 }
 
 
@@ -776,6 +811,11 @@ main {
   padding: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+/* 아카이빙 페이지의 오른쪽 섹션 스크롤 비활성화 */
+#page6 .right-section {
   overflow: hidden;
 }
 

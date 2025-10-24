@@ -1,20 +1,24 @@
 // 전역 변수
 let currentPage = 1;
 let messageArchive = JSON.parse(localStorage.getItem('messageArchive')) || [];
+let originalMessage = ''; // 원본 메시지 저장
+let damagedMessage = ''; // 훼손된 메시지 저장
 
-// 현재 날짜와 시간 표시 함수
+// 현재 날짜와 시간 표시 함수 (한국식 편지 형식)
 function updateDateTime() {
   const now = new Date();
-  const options = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    weekday: 'long'
-  };
-  const dateTimeString = now.toLocaleDateString('en-US', options);
+  
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  
+  // 한국식 편지 형식: "2025년 10월 24일 오후 3시 45분"
+  const period = hours < 12 ? '오전' : '오후';
+  const displayHours = hours % 12 || 12;
+  
+  const dateTimeString = `${year}년 ${month}월 ${day}일 ${period} ${displayHours}시 ${minutes}분`;
   
   const dateTimeElements = document.querySelectorAll('#currentDateTime');
   dateTimeElements.forEach(element => {
@@ -48,6 +52,40 @@ function loadFormData() {
     return formData;
   }
   return null;
+}
+
+// 메시지 훼손 함수 (랜덤하게 일부 글자를 밑줄로 대체)
+function damageMessage(message) {
+  if (!message || message.length === 0) return message;
+  
+  const messageArray = message.split('');
+  
+  // 공백과 줄바꿈이 아닌 글자들의 인덱스만 수집
+  const validIndices = [];
+  messageArray.forEach((char, index) => {
+    if (char !== ' ' && char !== '\n' && char !== '\r') {
+      validIndices.push(index);
+    }
+  });
+  
+  // 유효한 글자의 30%를 훼손 (최소 3글자)
+  const damageCount = Math.max(3, Math.floor(validIndices.length * 0.3));
+  const damagedIndices = new Set();
+  
+  // 랜덤하게 훼손할 위치 선택
+  while (damagedIndices.size < damageCount && damagedIndices.size < validIndices.length) {
+    const randomIdx = Math.floor(Math.random() * validIndices.length);
+    damagedIndices.add(validIndices[randomIdx]);
+  }
+  
+  // 선택된 위치의 글자를 밑줄로 대체
+  damagedIndices.forEach(index => {
+    messageArray[index] = '_';
+  });
+  
+  console.log(`메시지 훼손: 전체 ${validIndices.length}글자 중 ${damagedIndices.size}글자 훼손`);
+  
+  return messageArray.join('');
 }
 
 // 발신자/수신자 정보 표시 함수
@@ -91,11 +129,14 @@ function displayContactInfo() {
     if (displayReceiverName4) displayReceiverName4.textContent = formData.receiverName;
     if (displayReceiverPhone4) displayReceiverPhone4.textContent = formData.receiverPhone;
     
-    // 메시지 표시
+    // 메시지 표시 (훼손된 메시지가 있으면 그대로 유지)
     const displayMessageText = document.getElementById('displayMessageText');
     const messageText = document.getElementById('messageText');
     if (displayMessageText && messageText) {
-      displayMessageText.textContent = messageText.value;
+      // 이미 훼손된 메시지가 설정되어 있지 않은 경우에만 원본 표시
+      if (!damagedMessage || displayMessageText.textContent === '') {
+        displayMessageText.textContent = messageText.value;
+      }
     }
     
     // 발신자 정보 표시 (다른 페이지)
@@ -211,6 +252,16 @@ function showPage(pageId) {
     displayContactInfo();
   }
   
+  // page2로 이동할 때 개인정보 포스트잇 다시 표시
+  if (currentPage === 2) {
+    const privacyPostitContainer = document.getElementById('privacyPostitContainer');
+    const formContent = document.getElementById('formContent');
+    if (privacyPostitContainer && formContent) {
+      privacyPostitContainer.style.display = 'block';
+      formContent.style.display = 'none';
+    }
+  }
+  
   // 진행 절차 업데이트
   updateProgress();
 }
@@ -223,18 +274,6 @@ function goToPreviousPage() {
   }
 }
 
-// 메시지 훼손 함수 (___ 형태로 변경)
-function damageMessage(text) {
-  const words = text.split(' ');
-  const damagedWords = words.map((word, index) => {
-    // 랜덤하게 일부 단어를 ___로 대체
-    if (Math.random() < 0.3 && word.length > 1) {
-      return '___';
-    }
-    return word;
-  });
-  return damagedWords.join(' ');
-}
 
 // 출력 함수 (바로 출력)
 async function autoPrint() {
@@ -330,6 +369,55 @@ async function autoPrint() {
   }, 3000);
 }
 
+// 메시지를 아카이브에 저장하는 함수
+async function saveToArchive() {
+  const formData = loadFormData();
+  
+  if (formData && damagedMessage && originalMessage) {
+    const newMessage = {
+      senderName: formData.senderName,
+      senderPhone: formData.senderPhone,
+      receiverName: formData.receiverName,
+      receiverPhone: formData.receiverPhone,
+      message: damagedMessage, // 훼손된 메시지 저장
+      timestamp: new Date().toISOString()
+    };
+    
+    // 아카이브에 추가
+    messageArchive.push(newMessage);
+    
+    // localStorage에 저장
+    localStorage.setItem('messageArchive', JSON.stringify(messageArchive));
+    
+    console.log('훼손된 메시지가 아카이브에 저장되었습니다:', newMessage);
+    
+    // Google Sheets로 데이터 전송 (발신인/수신인 정보, 원본 메시지, 훼손된 메시지)
+    const sheetsData = {
+      senderName: formData.senderName,
+      senderPhone: formData.senderPhone,
+      receiverName: formData.receiverName,
+      receiverPhone: formData.receiverPhone,
+      originalMessage: originalMessage, // 원본 메시지
+      damagedMessage: damagedMessage, // 훼손된 메시지
+      timestamp: new Date().toISOString()
+    };
+    
+    try {
+      await sendToGoogleSheets(sheetsData);
+      console.log('Google Sheets에 데이터 전송 완료');
+    } catch (error) {
+      console.error('Google Sheets 전송 실패:', error);
+    }
+    
+    // 아카이브 화면 업데이트
+    updateArchive();
+    
+    // 저장 후 훼손된 메시지 초기화 (중복 저장 방지)
+    damagedMessage = '';
+    originalMessage = '';
+  }
+}
+
 // 아카이브 업데이트 (포스트잇 형태)
 function updateArchive() {
   const messageCount = document.getElementById('messageCount');
@@ -375,15 +463,36 @@ function updateArchive() {
       note.style.backgroundColor = colors[index % colors.length];
       note.style.zIndex = zIndex;
       
+      // 익명화된 발신자/수신자 정보 (이름의 첫 글자만 표시)
+      const anonymousSender = message.senderName && message.senderName.length > 0 
+        ? message.senderName.charAt(0) + '*'.repeat(message.senderName.length - 1) 
+        : '익명';
+      const anonymousReceiver = message.receiverName && message.receiverName.length > 0
+        ? message.receiverName.charAt(0) + '*'.repeat(message.receiverName.length - 1) 
+        : '익명';
+      
+      // 타임스탬프 포맷팅
+      const timestamp = new Date(message.timestamp).toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      // 메시지 미리보기 (30자까지만)
+      const messageText = message.message || '';
+      const messagePreview = messageText.length > 30 ? messageText.substring(0, 30) + '...' : messageText;
+      
       note.innerHTML = `
         <div class="archive-note-close">×</div>
         <div class="archive-note-header">
-          ${message.anonymousSender} → ${message.anonymousReceiver}
+          ${anonymousSender} → ${anonymousReceiver}
         </div>
         <div class="archive-note-content">
-          ${message.damagedMessage}
+          ${messagePreview}
         </div>
-        <div class="archive-note-time">${message.timestamp}</div>
+        <div class="archive-note-time">${timestamp}</div>
       `;
       
       // X 버튼 클릭 이벤트
@@ -568,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updateDateTime();
   setInterval(updateDateTime, 1000);
   
-  // 포스트잇 X 버튼 클릭 이벤트
+  // 첫 번째 포스트잇 X 버튼 클릭 이벤트
   const postitClose = document.getElementById('postitClose');
   const postitContainer = document.getElementById('postitContainer');
   const postitPlaceholder = document.getElementById('postitPlaceholder');
@@ -577,6 +686,16 @@ document.addEventListener('DOMContentLoaded', function() {
     postitClose.addEventListener('click', function() {
       postitContainer.style.display = 'none';
       postitPlaceholder.style.display = 'block';
+    });
+  }
+  
+  // 두 번째 포스트잇 X 버튼 클릭 이벤트
+  const postitClose2 = document.getElementById('postitClose2');
+  const postitContainer2 = document.getElementById('postitContainer2');
+  
+  if (postitClose2 && postitContainer2) {
+    postitClose2.addEventListener('click', function() {
+      postitContainer2.style.display = 'none';
     });
   }
   
@@ -620,13 +739,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 개인정보 동의 X 버튼 클릭 이벤트
   const privacyCloseBtn = document.querySelector('.privacy-postit-close');
-  const privacyPostitContainer = document.getElementById('privacyPostitContainer');
-  const formContent = document.getElementById('formContent');
-  
-  if (privacyCloseBtn && privacyPostitContainer && formContent) {
+  if (privacyCloseBtn) {
     privacyCloseBtn.addEventListener('click', function() {
-      privacyPostitContainer.style.display = 'none';
-      formContent.style.display = 'block';
+      const privacyPostitContainer = document.getElementById('privacyPostitContainer');
+      const formContent = document.getElementById('formContent');
+      
+      if (privacyPostitContainer && formContent) {
+        privacyPostitContainer.style.display = 'none';
+        formContent.style.display = 'block';
+      }
     });
   }
   
@@ -645,34 +766,77 @@ document.addEventListener('DOMContentLoaded', function() {
   const sendMessageBtn = document.getElementById('sendMessageBtn');
   if (sendMessageBtn) {
     let isPrinted = false;
+    let isArchived = false; // 아카이브 저장 여부 플래그
     
     sendMessageBtn.addEventListener('click', function() {
       if (!isPrinted) {
-        // 첫 클릭: 출력
-        window.print();
+        // 원본 메시지 저장
+        const messageTextarea = document.getElementById('messageText');
+        originalMessage = messageTextarea.value;
         
-        // 출력 후 버튼 텍스트를 "Next"로 변경
+        // 메시지 훼손
+        damagedMessage = damageMessage(originalMessage);
+        
+        console.log('원본 메시지:', originalMessage);
+        console.log('훼손된 메시지:', damagedMessage);
+        
+        // 프린트용 메시지 표시 영역에 훼손된 메시지 설정
+        const displayMessageText = document.getElementById('displayMessageText');
+        if (displayMessageText) {
+          displayMessageText.textContent = damagedMessage;
+        }
+        
+        // 약간의 지연 후 프린트 (DOM 업데이트 대기)
+        setTimeout(function() {
+          // 첫 클릭: 출력
+          window.print();
+        }, 100);
+        
+        // 출력 후 원본 메시지로 복구 및 아카이브에 저장
         window.addEventListener('afterprint', function() {
-          sendMessageBtn.textContent = 'Next';
-          isPrinted = true;
+          if (!isArchived) {
+            if (displayMessageText) {
+              displayMessageText.textContent = originalMessage;
+            }
+            sendMessageBtn.textContent = 'Next';
+            isPrinted = true;
+            
+            // 메시지를 아카이브에 저장 (한 번만)
+            saveToArchive();
+            isArchived = true;
+          }
         }, { once: true });
         
         // Safari 지원
         const mediaQueryList = window.matchMedia('print');
         mediaQueryList.addListener(function(mql) {
-          if (!mql.matches) {
+          if (!mql.matches && !isArchived) {
+            if (displayMessageText) {
+              displayMessageText.textContent = originalMessage;
+            }
             sendMessageBtn.textContent = 'Next';
             isPrinted = true;
+            
+            // 메시지를 아카이브에 저장 (한 번만)
+            saveToArchive();
+            isArchived = true;
           }
         });
         
         // fallback: 일정 시간 후 자동으로 변경
         setTimeout(function() {
-          if (!isPrinted) {
+          if (!isPrinted && !isArchived) {
+            if (displayMessageText) {
+              displayMessageText.textContent = originalMessage;
+            }
             sendMessageBtn.textContent = 'Next';
             isPrinted = true;
+            
+            // 메시지를 아카이브에 저장 (한 번만)
+            saveToArchive();
+            isArchived = true;
           }
-        }, 1000);
+        }, 2000);
       } else {
         // 두 번째 클릭: 다음 페이지로 이동
         showPage('page5');
