@@ -1212,20 +1212,21 @@ main {
     display: none !important;
   }
   
-  /* 편지지 줄 유지 */
+  /* 편지지 줄 유지 - 프린트용 흰색 */
   #page4 .right-section {
     background-image: repeating-linear-gradient(
       transparent,
       transparent calc(1.6em - 1px),
-      #e6e6e6 calc(1.6em - 1px),
-      #e6e6e6 1.6em
+      #ffffff calc(1.6em - 1px),
+      #ffffff 1.6em
     ) !important;
     background-size: 100% 1.6em !important;
   }
   
-  /* 모든 텍스트 요소 폰트 통일 */
+  /* 모든 텍스트 요소 폰트 통일 및 흰색 */
   #page4 * {
     font-family: "Sunflower", sans-serif !important;
+    color: #ffffff !important;
   }
   
   #printableArea h2 {
